@@ -10,20 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      db:
-        image: postgres:latest
-        ports: ['5432:5432']
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: solocali123#
-          POSTGRES_DB: java_jenkins
-        options: >-
-          --health-cmd="pg_isready -U postgres"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
     steps:
       - uses: actions/checkout@v4
 
@@ -36,7 +22,7 @@ jobs:
 
       - name: Wait for PostgreSQL to be ready
         run: |
-          until pg_isready -h localhost -p 5432 -U postgres; do
+          until pg_isready -h jhonnypostgres -p 5432 -U postgres; do
             echo "Esperando que PostgreSQL esté listo..."
             sleep 2
           done
@@ -44,9 +30,21 @@ jobs:
       - name: Run Maven build
         run: mvn clean install -DskipTests=false
         env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/java_jenkins
+          SPRING_DATASOURCE_URL: jdbc:postgresql://jhonnypostgres:5432/java_jenkins
           SPRING_DATASOURCE_USERNAME: postgres
           SPRING_DATASOURCE_PASSWORD: solocali123#
 
-      - name: Update dependency graph
-        uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
+      - name: Build Docker image
+        run: docker build -t java_jenkins_app .
+
+      - name: Run Docker container
+        run: |
+          docker run -d -p 8080:8080 \
+            -e SPRING_DATASOURCE_URL=jdbc:postgresql://jhonnypostgres:5432/java_jenkins \
+            -e SPRING_DATASOURCE_USERNAME=postgres \
+            -e SPRING_DATASOURCE_PASSWORD=solocali123# \
+            --network host java_jenkins_app
+
+      - name: Run tests (if applicable)
+        run: |
+          echo "Running tests after Docker container is up..."
