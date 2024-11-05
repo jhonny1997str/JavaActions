@@ -23,7 +23,7 @@ jobs:
 
       - name: Wait for PostgreSQL to be ready
         run: |
-          until pg_isready -h jhonnypostgres -p 5432 -U postgres; do
+          until pg_isready -h localhost -p 5432 -U postgres; do
             echo "Esperando que PostgreSQL esté listo..."
             sleep 2
           done
