@@ -13,14 +13,13 @@ jobs:
     services:
       postgres:
         image: postgres:latest
-        options: --health-cmd='pg_isready' --health-timeout=30s --health-retries=5
+        options: --health-cmd='pg_isready -h localhost -p 5432 -U postgres' --health-timeout=30s --health-retries=5
         ports:
           - 5432:5432
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: solocali123#
           POSTGRES_DB: java_jenkins
-
 
     steps:
       - name: Check out code
@@ -35,7 +34,7 @@ jobs:
 
       - name: Wait for PostgreSQL to be ready
         run: |
-          until pg_isready -h localhost -p 5432 -U postgres; do
+          until pg_isready -h postgres -p 5432 -U postgres; do
             echo "Esperando que PostgreSQL esté listo..."
             sleep 2
           done
@@ -43,7 +42,7 @@ jobs:
       - name: Run Maven build
         run: mvn clean install -DskipTests=false
         env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/java_jenkins
+          SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/java_jenkins
           SPRING_DATASOURCE_USERNAME: postgres
           SPRING_DATASOURCE_PASSWORD: solocali123#
 
@@ -53,7 +52,7 @@ jobs:
       - name: Run Docker container
         run: |
           docker run -d -p 8080:8080 --name java_jenkins_app \
-            -e SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/java_jenkins \
+            -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/java_jenkins \
             -e SPRING_DATASOURCE_USERNAME=postgres \
             -e SPRING_DATASOURCE_PASSWORD=solocali123# \
             java_jenkins_app
