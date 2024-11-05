@@ -13,7 +13,7 @@ import java.util.List;
 @RequestMapping("/api/clientes")
 public class ClienteControlador {
     @Autowired
-    private ClienteRepositorio clienteRepositorio; //vxcv
+    private ClienteRepositorio clienteRepositorio; //v
 
     @GetMapping
     public List<Cliente> listarClientes() {
