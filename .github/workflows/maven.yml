@@ -34,18 +34,3 @@ jobs:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/java_jenkins
           SPRING_DATASOURCE_USERNAME: postgres
           SPRING_DATASOURCE_PASSWORD: solocali123#
-
-      - name: Build Docker image
-        run: docker build -t java_jenkins_app .
-
-      - name: Run Docker container
-        run: |
-          docker run -d -p 8080:8080 --network mi_red --name java_jenkins_app \
-            -e SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/java_jenkins \
-            -e SPRING_DATASOURCE_USERNAME=postgres \
-            -e SPRING_DATASOURCE_PASSWORD=solocali123# \
-            java_jenkins_app
-
-      - name: Run tests (if applicable)
-        run: |
-          echo "Running tests after Docker container is up..."
