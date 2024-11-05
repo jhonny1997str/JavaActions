@@ -40,8 +40,7 @@ jobs:
 
       - name: Run Docker container
         run: |
-          docker run -d -p 8080:8080 \
-            --network mi_red \
+          docker run -d -p 8080:8080 --network mi_red --name java_jenkins_app \
             -e SPRING_DATASOURCE_URL=jdbc:postgresql://jhonnypostgres:5432/java_jenkins \
             -e SPRING_DATASOURCE_USERNAME=postgres \
             -e SPRING_DATASOURCE_PASSWORD=solocali123# \
